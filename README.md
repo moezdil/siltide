@@ -20,7 +20,7 @@ More on [the site](https://moezdil.github.io/siltide/): every tab, every key, an
 
 ## Supported accelerators
 
-The vendor list follows the device plugins in [HAMi](https://github.com/Project-HAMi/HAMi/tree/master/pkg/device), plus Apple and Intel. Every vendor is auto-detected. `--vendors nvidia,ascend` limits the probe. NVIDIA (an H100 SXM, driver 570.211.01, every metric checked against `nvidia-smi`) and Apple silicon (an M4 Pro) run on real hardware today. The rest are built against each vendor's documented tool output, with a fixture behind every parser. A hardware report through [an issue](https://github.com/moezdil/siltide/issues/new/choose) is the fastest way to move one from "should work" to confirmed.
+The vendor list follows the device plugins in [HAMi](https://github.com/Project-HAMi/HAMi/tree/master/pkg/device), plus Apple and Intel. Every vendor is auto-detected. `--vendors nvidia,ascend` limits the probe. NVIDIA (an H100 SXM, driver 570.211.01, every metric checked against `nvidia-smi`), Apple silicon (an M4 Pro), and AMD (a Radeon RX 9060 XT, RDNA4) run on real hardware today. On that AMD card the amdgpu driver serves VRAM but returns EBUSY for its SMU sensors, so utilization, temperature and power read as N/A there. The rest are built against each vendor's documented tool output, with a fixture behind every parser. A hardware report through [an issue](https://github.com/moezdil/siltide/issues/new/choose) is the fastest way to move one from "should work" to confirmed.
 
 **Per-process** is the column worth reading first: whether the vendor's tool
 names the processes holding a device, not just the device totals. It is what
