@@ -819,11 +819,11 @@ func (m Model) scrollStart() int {
 func (m Model) tableHeight() int {
 	switch m.tab {
 	case tabOverview:
-		return max(m.height-14, 5)
+		return max(m.height-16, 5)
 	case tabDevices:
 		return max(m.height/3, 4)
 	default:
-		return max(m.height-8, 3)
+		return max(m.height-10, 3)
 	}
 }
 
@@ -912,7 +912,7 @@ func (m Model) View() string {
 	lines := strings.Split(body, "\n")
 	// The suggestion list sits between the body and the bar, so the body
 	// gives up exactly the rows it takes and the interface keeps its height.
-	if keep := m.height - 3 - m.suggestionRows(); keep > 0 && len(lines) > keep {
+	if keep := m.height - 5 - m.suggestionRows(); keep > 0 && len(lines) > keep {
 		lines = lines[:keep]
 	}
 	for i := range lines {
@@ -920,7 +920,8 @@ func (m Model) View() string {
 			lines[i] = trunc(lines[i], m.width)
 		}
 	}
-	return m.header() + "\n" + m.tabBar() + "\n" + strings.Join(lines, "\n") + "\n" + m.footer()
+	rule := hr(m.th, m.width)
+	return m.header() + "\n" + m.tabBar() + "\n" + rule + "\n" + strings.Join(lines, "\n") + "\n" + rule + "\n" + m.footer()
 }
 
 func (m Model) header() string {

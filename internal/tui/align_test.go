@@ -313,3 +313,26 @@ func TestEventKindTally(t *testing.T) {
 		t.Errorf("no critical colour in the tally: %q", coloured)
 	}
 }
+
+// TestTableColumnRule checks a faint vertical rule sits between every column,
+// on the header and on each row.
+func TestTableColumnRule(t *testing.T) {
+	th := NewTheme("mono", nil)
+	cols := []column{{"A", 3, false}, {"B", 3, false}}
+	out := plain(th.table(cols, [][]string{{"x", "y"}}, -1, 0, 40, -1, false))
+	if n := strings.Count(out, "│"); n < 2 {
+		t.Fatalf("expected a column rule on header and row, got %d:\n%s", n, out)
+	}
+}
+
+// TestFrameRules checks the framed view separates the tab bar, the body and
+// the footer with horizontal rules.
+func TestFrameRules(t *testing.T) {
+	e := demoEngine(t)
+	m := New(e, Options{Theme: NewTheme("mono", nil)})
+	m.width, m.height = 120, 30
+	m.setTab(tabDevices)
+	if !strings.Contains(plain(m.View()), strings.Repeat("─", 40)) {
+		t.Fatalf("no horizontal rule in the framed view")
+	}
+}

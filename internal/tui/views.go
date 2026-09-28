@@ -333,7 +333,7 @@ func (m Model) viewDevices() string {
 		start := min(m.detailScroll, max(len(detail)-1, 0))
 		detail = append([]string{m.th.dim.Render(fmt.Sprintf("… %d lines above (wheel or PgUp)", start))}, detail[start:]...)
 	}
-	return table + "\n\n" + strings.Join(detail, "\n")
+	return table + "\n" + hr(m.th, m.width) + "\n" + strings.Join(detail, "\n")
 }
 
 var histMetrics = []struct {
