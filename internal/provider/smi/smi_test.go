@@ -292,3 +292,38 @@ func TestCnmonBlankProcessName(t *testing.T) {
 		}
 	}
 }
+
+// TestDRMDegraded covers a real AMD Radeon RX 9060 XT (Navi 44, RDNA4,
+// gfx1200): the amdgpu driver exposes VRAM through the memory manager but
+// every SMU-backed file (gpu_busy_percent, hwmon temp/power) is present yet
+// returns EBUSY, so those metrics must degrade to N/A instead of zero. The
+// EBUSY read is reproduced portably by putting a directory where the file
+// would be, which makes os.ReadFile fail the same way readStr sees it.
+func TestDRMDegraded(t *testing.T) {
+	root := t.TempDir()
+	write := func(p, v string) {
+		p = filepath.Join(root, p)
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(v+"\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	unreadable := func(p string) { // stand-in for an EBUSY sysfs file
+		if err := os.MkdirAll(filepath.Join(root, p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("card1/device/vendor", "0x1002")
+	write("card1/device/device", "0x7590")
+	write("card1/device/mem_info_vram_used", "59891712")
+	write("card1/device/mem_info_vram_total", "17095983104")
+	unreadable("card1/device/gpu_busy_percent")
+	unreadable("card1/device/hwmon/hwmon4/temp1_input")
+	unreadable("card1/device/hwmon/hwmon4/power1_average")
+	unreadable("card1/device/hwmon/hwmon4/power1_cap")
+
+	amd := readDRM(device.AMD, root, "0x1002", "AMD")
+	check(t, amd, want{1, amd[0].Name, "device", -1, -1, -1, 59891712, 17095983104})
+}
