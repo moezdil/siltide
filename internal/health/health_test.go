@@ -37,3 +37,21 @@ func TestScore(t *testing.T) {
 		t.Fatal("bands")
 	}
 }
+
+// TestPartialTelemetry covers a device (real AMD RX 9060 XT) whose driver
+// serves VRAM but returns EBUSY for utilization, temperature and power: the
+// score stays 100 but a note explains why the row is otherwise blank.
+func TestPartialTelemetry(t *testing.T) {
+	d := device.New(device.AMD, 0, "Radeon RX 9060 XT", "", "")
+	d.Metrics[device.MemUsed] = 59891712
+	d.Metrics[device.MemTotal] = 17095983104
+	s, n := Score(d, Options{TempWarn: 85})
+	if s != 100 || len(n) != 1 || n[0] != "driver reported memory but not utilization, temperature, or power" {
+		t.Fatalf("partial telemetry = %d %v", s, n)
+	}
+	// A reading in any of the three clears the note.
+	d.Metrics[device.Util] = 0
+	if _, n := Score(d, Options{TempWarn: 85}); len(n) != 0 {
+		t.Fatalf("util present should clear note: %v", n)
+	}
+}

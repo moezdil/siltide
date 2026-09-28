@@ -9,7 +9,8 @@
 // throttling 15, remap pending 10, over the warning temperature 10,
 // power-cap throttling 10, PCIe link narrower than the maximum 10, PCIe
 // link slower than the maximum 10, interconnect links down 10, interconnect
-// errors 5, no metrics at all 50.
+// errors 5, no metrics at all 50. A device that reports memory but no
+// utilization, temperature or power gets a note without a deduction.
 //
 // Bands: 90+ healthy, 75+ good, 50+ degraded, 25+ unhealthy, below 25
 // critical.
@@ -39,6 +40,18 @@ func Score(d device.Device, o Options) (int, []string) {
 	}
 	if len(d.Metrics) == 0 {
 		take(50, "no metrics reported")
+	}
+	// A device that reports memory but neither utilization, temperature nor
+	// power is not merely idle: its driver is not serving those readings (on
+	// RDNA4 amdgpu returns EBUSY for the SMU sysfs files). Note it without a
+	// deduction, since missing data never lowers the score.
+	_, hasUtil := d.Metrics.Get(device.Util)
+	_, hasTemp := d.Metrics.Get(device.Temp)
+	_, hasPower := d.Metrics.Get(device.Power)
+	_, hasMemT := d.Metrics.Get(device.MemTotal)
+	_, hasMemU := d.Metrics.Get(device.MemUsed)
+	if (hasMemT || hasMemU) && !hasUtil && !hasTemp && !hasPower {
+		notes = append(notes, "driver reported memory but not utilization, temperature, or power")
 	}
 	if v := d.Metrics.Or(device.EccUncorrected, 0); v > 0 {
 		take(30, fmt.Sprintf("%.0f uncorrected ECC errors", v))
