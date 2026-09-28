@@ -82,10 +82,40 @@ func readDRM(v device.Vendor, root, pciVendor, brand string) []device.Device {
 			}
 			set(m, device.PowerCap, readStr(filepath.Join(hw[0], "power1_cap")), 1e-6)
 		}
+		// PCIe link comes from the config space, not the SMU, so it reads even
+		// when a card returns EBUSY for utilisation, clocks and power.
+		set(m, device.PCIeWidth, readStr(filepath.Join(dev, "current_link_width")), 1)
+		set(m, device.PCIeMaxWidth, readStr(filepath.Join(dev, "max_link_width")), 1)
+		if g := pcieGen(readStr(filepath.Join(dev, "current_link_speed"))); g > 0 {
+			m[device.PCIeGen] = g
+		}
+		if g := pcieGen(readStr(filepath.Join(dev, "max_link_speed"))); g > 0 {
+			m[device.PCIeMaxGen] = g
+		}
 		d.Procs = procs[bus]
 		out = append(out, d)
 	}
 	return out
+}
+
+// pcieGen maps a DRM sysfs link speed ("32.0 GT/s PCIe") to its PCIe
+// generation: the kernel prints the transfer rate, not the generation.
+func pcieGen(s string) float64 {
+	switch v, _ := num(s); v {
+	case 2.5:
+		return 1
+	case 5.0:
+		return 2
+	case 8.0:
+		return 3
+	case 16.0:
+		return 4
+	case 32.0:
+		return 5
+	case 64.0:
+		return 6
+	}
+	return 0
 }
 
 // drmEngine remembers engine time per (pid, device) so the next sample can

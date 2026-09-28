@@ -323,7 +323,27 @@ func TestDRMDegraded(t *testing.T) {
 	unreadable("card1/device/hwmon/hwmon4/temp1_input")
 	unreadable("card1/device/hwmon/hwmon4/power1_average")
 	unreadable("card1/device/hwmon/hwmon4/power1_cap")
+	// PCIe link lives in config space, not the SMU, so it reads on this card.
+	write("card1/device/current_link_width", "16")
+	write("card1/device/max_link_width", "16")
+	write("card1/device/current_link_speed", "32.0 GT/s PCIe")
+	write("card1/device/max_link_speed", "32.0 GT/s PCIe")
 
 	amd := readDRM(device.AMD, root, "0x1002", "AMD")
 	check(t, amd, want{1, amd[0].Name, "device", -1, -1, -1, 59891712, 17095983104})
+	m := amd[0].Metrics
+	if m[device.PCIeGen] != 5 || m[device.PCIeMaxGen] != 5 || m[device.PCIeWidth] != 16 || m[device.PCIeMaxWidth] != 16 {
+		t.Fatalf("pcie = gen %v/%v width %v/%v", m[device.PCIeGen], m[device.PCIeMaxGen], m[device.PCIeWidth], m[device.PCIeMaxWidth])
+	}
+}
+
+func TestPCIeGen(t *testing.T) {
+	for _, c := range []struct {
+		s   string
+		gen float64
+	}{{"2.5 GT/s PCIe", 1}, {"8.0 GT/s PCIe", 3}, {"16.0 GT/s PCIe", 4}, {"32.0 GT/s PCIe", 5}, {"64.0 GT/s PCIe", 6}, {"", 0}, {"weird", 0}} {
+		if g := pcieGen(c.s); g != c.gen {
+			t.Errorf("pcieGen(%q) = %v, want %v", c.s, g, c.gen)
+		}
+	}
 }
