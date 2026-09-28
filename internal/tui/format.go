@@ -240,6 +240,15 @@ type column struct {
 // table renders a header and rows; sel highlights a row (-1 for none).
 // Rows scroll so the selection stays within height lines. sortCol marks
 // the sorted column in the header (-1 for none).
+// headDim dims each header cell so the column rule keeps its own colour.
+func headDim(t Theme, cells []string) []string {
+	out := make([]string, len(cells))
+	for i, c := range cells {
+		out[i] = t.dim.Render(c)
+	}
+	return out
+}
+
 func (t Theme) table(cols []column, rows [][]string, sel, height, width, sortCol int, desc bool) string {
 	return t.tableMarks(cols, rows, sel, height, width, sortCol, desc, nil)
 }
@@ -255,6 +264,7 @@ func (t Theme) tableMarks(cols []column, rows [][]string, sel, height, width, so
 		}
 		return pad(s, c.w)
 	}
+	sep := t.border.Render(" │ ")
 	var head []string
 	for i, c := range cols {
 		name := c.name
@@ -267,7 +277,7 @@ func (t Theme) tableMarks(cols []column, rows [][]string, sel, height, width, so
 		}
 		head = append(head, cell(c, name))
 	}
-	b.WriteString(t.dim.Render(strings.Join(head, " ")) + "\n")
+	b.WriteString(strings.Join(headDim(t, head), sep) + "\n")
 	start := 0
 	if height > 0 && sel >= height {
 		start = sel - height + 1
@@ -285,7 +295,7 @@ func (t Theme) tableMarks(cols []column, rows [][]string, sel, height, width, so
 			}
 			cells = append(cells, cell(c, v))
 		}
-		line := strings.Join(cells, " ")
+		line := strings.Join(cells, sep)
 		if marked[i] {
 			line = selected(t.accent, line)
 		}
