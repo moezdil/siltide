@@ -4,11 +4,11 @@
 # are rejected with their line number. `siltide --print-config` shows the
 # effective result.
 #
-# One file is not the only layout: `~/.config/accel/config.d/*.yaml` is read in
+# One file is not the only layout: `~/.config/siltide/config.d/*.yaml` is read in
 # name order after this file, and `--config` may name a directory of *.yaml
 # files instead. Later files win key by key, and a list (nodes, alert rules,
 # vendors) is replaced by the last file that sets it, so keep one concern in
-# one file. `accel --diagnose` prints every file that was read.
+# one file. `siltide --diagnose` prints every file that was read.
 
 refresh: 1s            # sampling interval
 vendors: []            # probe every vendor; or e.g. [nvidia, ascend]
