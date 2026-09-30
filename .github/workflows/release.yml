@@ -77,3 +77,15 @@ jobs:
     with:
       # github.ref_name is the tag (v1.2.3); the package wants 1.2.3
       version: ${{ github.ref_name }}
+
+  # Tells the tap to render the formula now instead of on its next cron run.
+  # GITHUB_TOKEN cannot reach another repository, so this needs a token with
+  # Contents: write on moezdil/homebrew-tap.
+  tap:
+    needs: goreleaser
+    if: ${{ !contains(github.ref_name, '-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh api repos/moezdil/homebrew-tap/dispatches -f event_type=release
+        env:
+          GH_TOKEN: ${{ secrets.TAP_DISPATCH_TOKEN }}
