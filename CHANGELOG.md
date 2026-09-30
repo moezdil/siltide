@@ -4,6 +4,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## Unreleased
 
+## 0.1.4 - 2026-09-30
+
+### Changed
+- A stable release updates the Homebrew formula as soon as it is published, instead of on the tap's next six-hourly run.
+
+### Fixed
+- `examples/config.yaml` named `~/.config/accel/config.d` and `accel --diagnose` from before the rename; it now names the `siltide` paths the loader reads.
+
+## 0.1.3 - 2026-09-28
+
+### Added
+- AMD and Intel rows show the current and maximum PCIe link generation and width from sysfs, so health can catch a card running at reduced width or generation.
+- A device that reports memory but no utilization, temperature or power gets an informational health note instead of a silent blank row.
+
+### Changed
+- AMD is confirmed on real hardware (Radeon RX 9060 XT, RDNA4). On that card amdgpu returns EBUSY for its SMU sensors, so utilization, temperature and power read as N/A.
+- Table columns, the tab bar and the footer are separated by a rule in the theme's border colour.
+
+## 0.1.2 - 2026-09-26
+
+### Changed
+- The GitHub owner is now `moezdil`; every link, install command and the Homebrew tap point there.
+
 ## 0.1.1 - 2026-09-19
 
 ### Fixed
