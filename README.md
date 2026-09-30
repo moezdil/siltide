@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/moezdil/siltide/actions/workflows/ci.yml"><img src="https://github.com/moezdil/siltide/actions/workflows/ci.yml/badge.svg" alt="ci"></a>
-  <a href="https://github.com/moezdil/siltide/releases"><img src="https://img.shields.io/github/v/release/moezdil/siltide?include_prereleases&sort=semver" alt="release"></a>
+  <a href="https://github.com/moezdil/siltide/releases"><img src="https://img.shields.io/github/v/release/moezdil/siltide?sort=semver" alt="release"></a>
   <a href="go.mod"><img src="https://img.shields.io/github/go-mod/go-version/moezdil/siltide" alt="go version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="license"></a>
   <a href="https://github.com/sponsors/moezdil"><img src="https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?logo=githubsponsors&logoColor=white" alt="sponsor"></a>
