@@ -8,6 +8,7 @@
   <a href="go.mod"><img src="https://img.shields.io/github/go-mod/go-version/moezdil/siltide" alt="go version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="license"></a>
   <a href="https://github.com/sponsors/moezdil"><img src="https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?logo=githubsponsors&logoColor=white" alt="sponsor"></a>
+  <a title="Tool of The Week on Terminal Trove, the $HOME of all things in the terminal" href="https://terminaltrove.com/siltide/"><img src="https://cdn.terminaltrove.com/media/badges/tool_of_the_week/png/terminal_trove_tool_of_the_week_gold_transparent.png" alt="Terminal Trove Tool of The Week" height="28"></a>
 </p>
 
 siltide is a terminal monitor for AI accelerators from 15 vendors: GPUs, NPUs, XPUs, MLUs, DCUs, GCUs, and Apple silicon. It shows utilization, memory, processes, power, thermals, links, and health per device. History stays on disk. Pods and Slurm jobs sit next to processes. JSON and Prometheus cover fleets.
