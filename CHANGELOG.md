@@ -4,6 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## Unreleased
 
+### Fixed
+- Docs said utilization, temperature and power read as N/A on the Radeon RX 9060 XT. On kernel 7.0.0-34 they read and match `rocm-smi`, idle and under load; N/A now applies only where amdgpu returns EBUSY.
+
 ## 0.1.4 - 2026-09-30
 
 ### Changed
