@@ -548,13 +548,25 @@ func (r *Resolver) Describe(ctx context.Context, ns, name string) (string, error
 				Reason  string    `json:"reason"`
 				Message string    `json:"message"`
 				Last    time.Time `json:"lastTimestamp"`
+				Event   time.Time `json:"eventTime"`
+				First   time.Time `json:"firstTimestamp"`
 			} `json:"items"`
 		}
-		q := url.QueryEscape("involvedObject.name=" + name + ",involvedObject.namespace=" + ns)
+		sel := "involvedObject.name=" + name + ",involvedObject.namespace=" + ns
+		if p.UID != "" {
+			sel += ",involvedObject.uid=" + p.UID // a recreated pod keeps its name, not its events
+		}
+		q := url.QueryEscape(sel)
 		if r.get(ctx, "/api/v1/namespaces/"+ns+"/events?fieldSelector="+q, &evs) == nil && len(evs.Items) > 0 {
 			b.WriteString("\nEvents:\n")
 			for _, e := range evs.Items {
-				fmt.Fprintf(&b, "  %s %-8s %-20s %s\n", e.Last.Format("15:04:05"), e.Type, e.Reason, e.Message)
+				at := e.Last
+				for _, t := range []time.Time{e.Event, e.First} {
+					if at.IsZero() {
+						at = t
+					}
+				}
+				fmt.Fprintf(&b, "  %s %-8s %-20s %s\n", at.Format("15:04:05"), e.Type, e.Reason, e.Message)
 			}
 		}
 	}

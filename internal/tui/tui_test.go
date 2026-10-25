@@ -359,3 +359,11 @@ func TestSelfLogView(t *testing.T) {
 		t.Errorf("text %q", m.text)
 	}
 }
+
+func TestUnknownPodDoesNotOpenAnother(t *testing.T) {
+	m := New(demoEngine(t), Options{Theme: NewTheme("mono", nil)})
+	m.command("logs no-such-pod")
+	if !strings.Contains(m.notice, "no pod matches no-such-pod") {
+		t.Fatalf("notice %q", m.notice)
+	}
+}

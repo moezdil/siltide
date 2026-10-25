@@ -681,8 +681,9 @@ func (m *Model) command(line string) {
 	case "live":
 		m.cursor = time.Time{}
 	case "describe", "logs":
-		if arg != "" {
-			m.jumpPod(arg)
+		if arg != "" && !m.jumpPod(arg) {
+			m.say("no pod matches " + arg)
+			return
 		}
 		if cmd == "logs" {
 			m.logs()

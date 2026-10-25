@@ -76,7 +76,11 @@ func TestAPI(t *testing.T) {
 		case strings.Contains(r.URL.Path, "/log"):
 			_, _ = w.Write([]byte("line1\nline2\n"))
 		case strings.Contains(r.URL.Path, "/events"):
-			_ = json.NewEncoder(w).Encode(map[string]any{"items": []any{map[string]any{"type": "Normal", "reason": "Scheduled", "message": "ok"}}})
+			if !strings.Contains(r.URL.Query().Get("fieldSelector"), "involvedObject.uid=u1") {
+				w.WriteHeader(http.StatusBadRequest) // events of a pod with the same name but another uid
+				return
+			}
+			_ = json.NewEncoder(w).Encode(map[string]any{"items": []any{map[string]any{"type": "Normal", "reason": "Scheduled", "message": "ok", "eventTime": "2026-09-16T10:00:05Z"}}})
 		}
 	}))
 	defer srv.Close()
@@ -96,6 +100,9 @@ func TestAPI(t *testing.T) {
 	desc, err := r.Describe(context.Background(), "inf", "chat-api-7d9f8b6c5-x2k9p")
 	if err != nil || !strings.Contains(desc, "Scheduled") || !strings.Contains(desc, "nvidia.com/gpu=2") {
 		t.Fatalf("%q %v", desc, err)
+	}
+	if !strings.Contains(desc, "10:00:05 Normal") {
+		t.Fatalf("event time not taken from eventTime: %q", desc)
 	}
 	logs, err := r.Logs(context.Background(), "inf", "chat-api-7d9f8b6c5-x2k9p", "main", 10)
 	if err != nil || !strings.HasPrefix(logs, "line1") {
