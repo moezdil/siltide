@@ -1,9 +1,10 @@
 # Used by goreleaser: the binary is already built for the target platform.
-FROM alpine:3.20
-# gcompat: NVML's glibc .so has no glibc dynamic loader on musl otherwise.
-# The binary sits at / so a host /usr mounted over the container's /usr
-# (for vendor libraries and CLIs) cannot hide it.
-RUN apk add --no-cache gcompat
+# A glibc base: NVML is a glibc .so, and the DaemonSet bind-mounts the host's
+# libnvidia-ml.so.1 into it. The image ships `insecure: true` (a plain
+# `docker run` has no TLS); put a token in front of it with SILTIDE_TOKEN.
+FROM debian:12-slim
+RUN mkdir -p /etc/siltide && echo 'insecure: true' > /etc/siltide/config.yaml
+ENV SILTIDE_CONFIG=/etc/siltide/config.yaml
 COPY siltide /siltide
 ENTRYPOINT ["/siltide"]
-CMD ["--service", "--listen", ":9800", "--insecure"]
+CMD ["--service", "--listen", ":9800"]

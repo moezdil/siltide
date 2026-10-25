@@ -1,8 +1,9 @@
 # siltide on every accelerator node: a headless collector that Prometheus
 # scrapes and that `siltide --remote` or `nodes:` in a config can attach to.
 #
-# The pod needs the vendor tools and libraries of the host, so /usr and the
-# driver directories are mounted read-only. Kubernetes correlation uses the
+# The image is glibc-based, so the host's /usr must not be mounted over it.
+# Only the NVML library is bind-mounted; change its path (/usr/lib64 on RHEL,
+# for one) to match the node. Vendor CLIs are read from /opt. Kubernetes correlation uses the
 # kubelet log directory and, through the service account, the API server.
 apiVersion: v1
 kind: ServiceAccount
@@ -81,7 +82,7 @@ spec:
             requests: {cpu: 50m, memory: 64Mi}
             limits: {memory: 256Mi}
           volumeMounts:
-            - {name: usr, mountPath: /usr, readOnly: true}
+            - {name: nvml, mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1, readOnly: true}
             - {name: opt, mountPath: /opt, readOnly: true}
             - {name: dev, mountPath: /dev}
             - {name: sys, mountPath: /sys, readOnly: true}
@@ -89,7 +90,7 @@ spec:
             - {name: podres, mountPath: /var/lib/kubelet/pod-resources, readOnly: true}
             - {name: state, mountPath: /var/lib/siltide}
       volumes:
-        - {name: usr, hostPath: {path: /usr}}
+        - {name: nvml, hostPath: {path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1, type: File}}
         - {name: opt, hostPath: {path: /opt}}
         - {name: dev, hostPath: {path: /dev}}
         - {name: sys, hostPath: {path: /sys}}
