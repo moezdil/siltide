@@ -43,3 +43,41 @@ func TestDaemonSetKeepsImageUsr(t *testing.T) {
 		}
 	}
 }
+
+// Describe lists a pod's events through the API; without the rule it printed
+// no events and said nothing about why.
+func TestDaemonSetRoleReadsEventsAndLogs(t *testing.T) {
+	b, err := os.ReadFile("deploy/kubernetes/daemonset.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	granted := map[string]bool{}
+	dec := yaml.NewDecoder(bytes.NewReader(b))
+	for {
+		var d struct {
+			Kind  string
+			Rules []struct {
+				Resources []string
+				Verbs     []string
+			}
+		}
+		if err := dec.Decode(&d); err != nil {
+			break
+		}
+		if d.Kind != "ClusterRole" {
+			continue
+		}
+		for _, r := range d.Rules {
+			for _, res := range r.Resources {
+				for _, v := range r.Verbs {
+					granted[res+" "+v] = true
+				}
+			}
+		}
+	}
+	for _, want := range []string{"pods list", "events list", "pods/log get"} {
+		if !granted[want] {
+			t.Errorf("ClusterRole lacks %s", want)
+		}
+	}
+}

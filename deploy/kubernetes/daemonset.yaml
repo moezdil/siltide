@@ -17,7 +17,7 @@ metadata:
   name: siltide
 rules:
   - apiGroups: [""]
-    resources: ["pods"]
+    resources: ["pods", "pods/log", "events"] # events and logs feed describe and logs
     verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
