@@ -4,8 +4,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## Unreleased
 
+## 0.1.5 - 2026-10-25
+
 ### Fixed
+- The Kubernetes DaemonSet did not run. The image is now glibc-based so NVML loads, the manifest bind-mounts only `libnvidia-ml.so.1` instead of the host `/usr` (which hid the image's libraries and crash-looped the pod), and the image no longer passes the nonexistent `--insecure` flag; it ships `insecure: true` in its config instead. Checked on a node with an RTX 3090: metrics, processes mapped to pods, `d` and `l` in the Kubernetes tab.
+- The DaemonSet role can read pod events and logs, so `d` shows a pod's events.
+- Describe showed `00:00:00` for events without `lastTimestamp`, and listed events of an earlier pod with the same name.
+- `:describe` and `:logs` with a name no pod matches said nothing and opened the selected pod; they now report it.
 - Docs said utilization, temperature and power read as N/A on the Radeon RX 9060 XT. On kernel 7.0.0-34 they read and match `rocm-smi`, idle and under load; N/A now applies only where amdgpu returns EBUSY.
+
+### Changed
+- Go toolchain 1.26.10, for the standard library fixes `govulncheck` reports.
+- Release workflows scope write permissions to the job, base images are pinned by digest, and CodeQL runs on main and on pull requests.
 
 ## 0.1.4 - 2026-09-30
 
