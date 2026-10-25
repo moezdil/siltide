@@ -7,18 +7,20 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
-  packages: write
-  # The same signed statement per artifact that a tagged release gets. The
-  # download page tells everyone to run `gh attestation verify`, and until
-  # this was here that command answered 404 for every build on main -- which
-  # is every build there is before the first stable tag.
-  id-token: write
-  attestations: write
+  contents: read
 
 jobs:
   prerelease:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      # The same signed statement per artifact that a tagged release gets. The
+      # download page tells everyone to run `gh attestation verify`, and until
+      # this was here that command answered 404 for every build on main -- which
+      # is every build there is before the first stable tag.
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

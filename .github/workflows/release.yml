@@ -4,16 +4,18 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write
-  packages: write
-  # A signed statement per artifact saying which workflow, at which commit,
-  # produced it. `gh attestation verify` is what reads it.
-  id-token: write
-  attestations: write
+  contents: read
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      # A signed statement per artifact saying which workflow, at which commit,
+      # produced it. `gh attestation verify` is what reads it.
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
