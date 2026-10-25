@@ -5,7 +5,7 @@ go 1.26.0
 // The patch releases below this carry six standard-library advisories that
 // govulncheck reports against our own code paths. Building with anything
 // older is not something to leave to whatever the machine happens to have.
-toolchain go1.26.6
+toolchain go1.26.10
 
 require (
 	github.com/charmbracelet/bubbletea v1.3.10
