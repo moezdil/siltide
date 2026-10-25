@@ -6,11 +6,11 @@ COPY . .
 ARG VERSION=dev
 RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /siltide .
 
-# A minimal base rather than scratch: purego's dlopen needs a dynamic
-# loader. The DaemonSet mounts the host's real one over /usr; gcompat
-# covers a plain `docker run`, where NVML's glibc .so has none otherwise.
-FROM alpine:3.20
-RUN apk add --no-cache gcompat
-COPY --from=build /siltide /usr/local/bin/siltide
-ENTRYPOINT ["siltide"]
+# A glibc base: NVML is a glibc .so, and the DaemonSet bind-mounts the host's
+# libnvidia-ml.so.1 into it. Same config as Dockerfile.release.
+FROM debian:12-slim
+RUN mkdir -p /etc/siltide && echo 'insecure: true' > /etc/siltide/config.yaml
+ENV SILTIDE_CONFIG=/etc/siltide/config.yaml
+COPY --from=build /siltide /siltide
+ENTRYPOINT ["/siltide"]
 CMD ["--service", "--listen", ":9800"]
