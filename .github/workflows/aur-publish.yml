@@ -45,7 +45,7 @@ jobs:
           v="$VERSION"
           v="${v#v}"   # the release workflow passes the tag, a person passes the number
           base="https://github.com/moezdil/siltide/releases/download/v$v"
-          curl -fsSL "$base/checksums.txt" -o checksums.txt
+          curl --proto '=https' -fsSL "$base/checksums.txt" -o checksums.txt
           amd=$(awk '$2 == "siltide-linux-amd64" { print $1 }' checksums.txt)
           arm=$(awk '$2 == "siltide-linux-arm64" { print $1 }' checksums.txt)
           [ -n "$amd" ] && [ -n "$arm" ] || { echo "release v$v publishes no linux checksums"; exit 1; }

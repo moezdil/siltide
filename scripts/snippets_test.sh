@@ -46,7 +46,7 @@ PY
 # and that allowance is sixty requests an hour per address. Running out is not
 # a broken command, so say so and check only what parses. /rate_limit does not
 # itself count against the limit.
-budget="$(curl -fsSL https://api.github.com/rate_limit 2>/dev/null |
+budget="$(curl --proto '=https' -fsSL https://api.github.com/rate_limit 2>/dev/null |
 	tr ',' '\n' | sed -n 's/.*"remaining"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -1)"
 network=yes
 if [ "${budget:-1}" -lt 4 ] 2>/dev/null; then

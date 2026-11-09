@@ -80,7 +80,9 @@ spec:
             privileged: true # device nodes and vendor libraries
           resources:
             requests: {cpu: 50m, memory: 64Mi}
-            limits: {memory: 256Mi}
+            # State and logs go to the hostPath below, so this only bounds the
+            # container's own layer and its stdout.
+            limits: {memory: 256Mi, ephemeral-storage: 256Mi}
           volumeMounts:
             - {name: nvml, mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1, readOnly: true}
             - {name: opt, mountPath: /opt, readOnly: true}

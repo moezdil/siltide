@@ -70,13 +70,13 @@ tag_names() {
 # the newest release there is. Somebody running the installer wants siltide,
 # not a lecture about release channels -- but they are told which one it is.
 latest_version() {
-	v="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null |
+	v="$(curl --proto '=https' -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null |
 		tag_names | head -1)"
 	if [ -n "$v" ]; then
 		echo "$v"
 		return
 	fi
-	curl -fsSL "https://api.github.com/repos/${REPO}/releases?per_page=30" 2>/dev/null |
+	curl --proto '=https' -fsSL "https://api.github.com/repos/${REPO}/releases?per_page=30" 2>/dev/null |
 		tag_names | head -1
 }
 
@@ -139,8 +139,8 @@ main() {
 	trap 'rm -rf "$tmp"' EXIT
 
 	echo "install: siltide ${version} for ${asset#siltide-}"
-	curl -fsSL "${base}/${asset}" -o "${tmp}/${asset}" || die "no asset ${asset} on release v${version}"
-	curl -fsSL "${base}/checksums.txt" -o "${tmp}/checksums.txt" || die "release v${version} publishes no checksums"
+	curl --proto '=https' -fsSL "${base}/${asset}" -o "${tmp}/${asset}" || die "no asset ${asset} on release v${version}"
+	curl --proto '=https' -fsSL "${base}/checksums.txt" -o "${tmp}/checksums.txt" || die "release v${version} publishes no checksums"
 	verify "${tmp}/${asset}" "${tmp}/checksums.txt" "$asset"
 
 	dir="$(install_dir)"
